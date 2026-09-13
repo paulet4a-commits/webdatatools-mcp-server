@@ -1,4 +1,4 @@
-# @webdatatools/mcp-server
+# webdatatools MCP server
 
 An MCP (Model Context Protocol) server that gives AI agents — Claude Desktop, Cursor, Cline, ChatGPT desktop, or
 any other MCP client — ten web-data tools backed by [WebDataTools' Apify Actors](https://apify.com/webdatatools):
@@ -17,7 +17,7 @@ billed to your Apify credit, not ours. Nothing is sent anywhere else.
 ## Quick start (no install)
 
 ```bash
-npx @webdatatools/mcp-server
+npx -y github:paulet4a-commits/webdatatools-mcp-server
 ```
 
 The server speaks MCP over stdio. It reads your token from the `APIFY_TOKEN` environment variable. If
@@ -33,7 +33,7 @@ Edit `claude_desktop_config.json` (Settings → Developer → Edit Config) and a
   "mcpServers": {
     "webdatatools": {
       "command": "npx",
-      "args": ["-y", "@webdatatools/mcp-server"],
+      "args": ["-y", "github:paulet4a-commits/webdatatools-mcp-server"],
       "env": {
         "APIFY_TOKEN": "apify_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       }
@@ -54,7 +54,7 @@ Cursor → Settings → MCP → Add new MCP server, or edit `.cursor/mcp.json` i
   "mcpServers": {
     "webdatatools": {
       "command": "npx",
-      "args": ["-y", "@webdatatools/mcp-server"],
+      "args": ["-y", "github:paulet4a-commits/webdatatools-mcp-server"],
       "env": {
         "APIFY_TOKEN": "apify_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       }
@@ -72,7 +72,7 @@ Cline → MCP Servers → Configure MCP Servers, which opens `cline_mcp_settings
   "mcpServers": {
     "webdatatools": {
       "command": "npx",
-      "args": ["-y", "@webdatatools/mcp-server"],
+      "args": ["-y", "github:paulet4a-commits/webdatatools-mcp-server"],
       "env": {
         "APIFY_TOKEN": "apify_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
       },
@@ -83,7 +83,7 @@ Cline → MCP Servers → Configure MCP Servers, which opens `cline_mcp_settings
 ```
 
 Any other MCP client that supports a stdio server with an env map works the same way — set `command` to
-`npx`, `args` to `["-y", "@webdatatools/mcp-server"]`, and pass `APIFY_TOKEN` in `env`.
+`npx`, `args` to `["-y", "github:paulet4a-commits/webdatatools-mcp-server"]`, and pass `APIFY_TOKEN` in `env`.
 
 ## Tools
 
@@ -142,14 +142,14 @@ npm start          # run the server on stdio (needs APIFY_TOKEN in the environme
 
 ## Publishing (not yet published — maintainer decision)
 
-This package is publish-ready but has **not** been published to npm. When ready:
+Install straight from GitHub — no npm account or publish step needed:
 
 ```bash
-npm login
-npm publish --access public
+npx -y github:paulet4a-commits/webdatatools-mcp-server
 ```
 
-(`--access public` is required because `@webdatatools/mcp-server` is a scoped package.)
+Publishing to npm would only shorten that to `npx -y @webdatatools/mcp-server`; the GitHub form above is
+verified working and is what the config examples use.
 
 ## Listing on MCP directories
 
