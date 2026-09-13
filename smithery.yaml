@@ -1,0 +1,27 @@
+# Smithery deployment config for a stdio-based custom Node.js MCP server.
+# Docs: https://smithery.ai/docs (Build > Deployments). Verify this file against the
+# current spec before submitting — Smithery's YAML schema has changed over time.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - apifyToken
+    properties:
+      apifyToken:
+        type: string
+        title: Apify API token
+        description: >-
+          Your personal Apify API token. Get a free one (with $5/month free credit) at
+          https://console.apify.com/settings/integrations. Every tool call is billed to
+          this account, never to the server author.
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['bin/cli.js'],
+      env: {
+        APIFY_TOKEN: config.apifyToken
+      }
+    })
+  exampleConfig:
+    apifyToken: apify_api_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

@@ -1,0 +1,50 @@
+{
+  "name": "@webdatatools/mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server exposing WebDataTools' Apify Actors (web search, article extraction, site crawling, contact & tech-stack detection, company profiling, e-mail/DNS security, package health, Google search) as tools for Claude Desktop, Cursor, Cline and other MCP clients. Uses your own Apify API token — billed to you, not us.",
+  "type": "module",
+  "bin": {
+    "webdatatools-mcp-server": "bin/cli.js"
+  },
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "smithery.yaml"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "apify",
+    "web-scraping",
+    "claude",
+    "claude-desktop",
+    "cursor",
+    "cline",
+    "ai-agent",
+    "web-search"
+  ],
+  "license": "MIT",
+  "author": "WebDataTools",
+  "homepage": "https://apify.com/webdatatools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/webdatatools/mcp-server"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "ajv": "^8.20.0"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.0"
+  }
+}
