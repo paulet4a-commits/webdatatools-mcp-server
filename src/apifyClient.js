@@ -38,7 +38,8 @@ export async function runActor(actorSlug, input, options = {}) {
     throw new ApifyToolError(missingTokenMessage(), { code: "MISSING_TOKEN" });
   }
 
-  const url = `${API_BASE}/acts/${actorSlug}/run-sync-get-dataset-items?token=${encodeURIComponent(token)}`;
+  const timeoutSecs = Math.floor(timeoutMs / 1000);
+  const url = `${API_BASE}/acts/${actorSlug}/run-sync-get-dataset-items?token=${encodeURIComponent(token)}&timeout=${timeoutSecs}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -53,7 +54,7 @@ export async function runActor(actorSlug, input, options = {}) {
   } catch (err) {
     if (err.name === "AbortError") {
       throw new ApifyToolError(
-        `The ${actorSlug} run timed out after ${Math.round(timeoutMs / 1000)}s. ` +
+        `The ${actorSlug} run timed out after ${Math.round(timeoutMs / 1000)}s and was stopped at that same limit on Apify's side. ` +
           "Try a smaller request (fewer URLs/pages/items) and try again.",
         { code: "TIMEOUT" }
       );
