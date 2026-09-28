@@ -108,6 +108,16 @@ when and how to call it. Most tools accept either a singular convenience field (
 `package`, `query`) or a plural batch array (`urls`, `domains`, `emails`, `packages`, `queries`); the plural
 form wins when both are given.
 
+## More WebDataTools MCP servers
+
+Every WebDataTools Actor is also available as a tool, grouped by theme:
+
+- [webdatatools-domain-mcp](https://github.com/paulet4a-commits/webdatatools-domain-mcp) — domain & website intelligence (WHOIS/RDAP, DNS/e-mail security, TLS, subdomains, tech stack, SEO)
+- [webdatatools-rag-mcp](https://github.com/paulet4a-commits/webdatatools-rag-mcp) — web content for AI & RAG
+- [webdatatools-social-mcp](https://github.com/paulet4a-commits/webdatatools-social-mcp) — search, video & social data
+- [webdatatools-leads-mcp](https://github.com/paulet4a-commits/webdatatools-leads-mcp) — leads, jobs & company data
+- [webdatatools-dev-mcp](https://github.com/paulet4a-commits/webdatatools-dev-mcp) — developer, app & research data
+
 ## Pricing
 
 There is no charge for the MCP server itself. Each tool call runs the underlying Actor on **your** Apify
