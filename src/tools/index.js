@@ -1,5 +1,5 @@
 import { webSearch, readUrl, googleSearch } from "./searchTools.js";
-import { crawlSiteMarkdown, extractContacts, detectTechStack } from "./siteTools.js";
+import { crawlSiteMarkdown, extractContacts, detectTechStack, extractWithSelectors } from "./siteTools.js";
 import { companyProfile, checkEmailSecurity, validateEmails, packageHealth } from "./dataTools.js";
 
 // Order matches the README tool table and the task's priority list.
@@ -9,6 +9,7 @@ export const TOOLS = [
   crawlSiteMarkdown,
   extractContacts,
   detectTechStack,
+  extractWithSelectors,
   companyProfile,
   checkEmailSecurity,
   validateEmails,

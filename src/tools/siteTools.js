@@ -124,3 +124,53 @@ export const detectTechStack = {
     });
   },
 };
+
+export const extractWithSelectors = {
+  name: "extract_with_selectors",
+  actor: "webdatatools~css-selector-extractor",
+  description:
+    "Extract exact fields from any web page with CSS selectors — no browser, cheap and fast. " +
+    "Use `itemSelector` for list pages (one object per product/card/row), `linkSelector` + `maxPages` to follow pagination or detail links, " +
+    "and `sitemapUrl` to process a whole site. Billed per page, so keep `maxPages` as low as the task allows.",
+  inputSchema: {
+    type: "object",
+    properties: {
+      url: { type: "string", description: "A page to extract from, e.g. https://books.toscrape.com/." },
+      urls: { type: "array", items: { type: "string" }, description: "Several pages. Overrides `url` when non-empty." },
+      selectors: {
+        type: "array",
+        description: 'Fields to extract: [{"name":"price","selector":".price","type":"text"}]. type: text | html | attr (needs "attribute") | count.',
+        items: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            selector: { type: "string" },
+            type: { type: "string", enum: ["text", "html", "attr", "count"] },
+            attribute: { type: "string" },
+          },
+          required: ["name", "selector"],
+        },
+      },
+      itemSelector: { type: "string", description: "CSS selector of repeated items; selectors are then searched inside each item." },
+      linkSelector: { type: "string", description: "CSS selector of links to follow (pagination or detail pages)." },
+      maxPages: { type: "integer", minimum: 1, maximum: 5000, description: "Total page cap when following links or reading a sitemap. This is the billed unit." },
+      sitemapUrl: { type: "string", description: "A sitemap.xml to read page URLs from." },
+      includeMetadata: { type: "boolean", description: "Also return title, description, canonical URL, Open Graph and JSON-LD." },
+    },
+    required: ["selectors"],
+  },
+  mapInput(args) {
+    const urls = toArray(args.url, args.urls);
+    if (urls.length === 0 && !args.sitemapUrl) throw new Error("Provide `url`, a non-empty `urls` array, or `sitemapUrl`.");
+    if (!Array.isArray(args.selectors) || args.selectors.length === 0) throw new Error("`selectors` must be a non-empty array.");
+    return pickDefined({
+      urls: urls.length ? urls : undefined,
+      selectors: args.selectors,
+      itemSelector: args.itemSelector,
+      linkSelector: args.linkSelector,
+      maxPages: args.maxPages,
+      sitemapUrls: args.sitemapUrl ? [args.sitemapUrl] : undefined,
+      includeMetadata: args.includeMetadata,
+    });
+  },
+};

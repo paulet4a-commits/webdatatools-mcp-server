@@ -13,10 +13,11 @@ const EXPECTED_NAMES = [
   "validate_emails",
   "package_health",
   "google_search",
+  "extract_with_selectors",
 ];
 
 describe("tool schema validity", () => {
-  it("exposes exactly the ten expected tools", () => {
+  it("exposes exactly the eleven expected tools", () => {
     expect(TOOLS.map((t) => t.name).sort()).toEqual([...EXPECTED_NAMES].sort());
   });
 

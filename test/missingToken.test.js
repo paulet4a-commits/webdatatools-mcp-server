@@ -15,7 +15,7 @@ describe("missing-token behaviour", () => {
 
   it("still lists all tools when APIFY_TOKEN is missing, so the client UI doesn't look broken", () => {
     const tools = listToolSummaries();
-    expect(tools.length).toBe(10);
+    expect(tools.length).toBe(11);
     expect(tools.every((t) => typeof t.inputSchema === "object")).toBe(true);
   });
 

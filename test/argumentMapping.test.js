@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { findTool } from "../src/tools/index.js";
+import { extractWithSelectors } from "../src/tools/siteTools.js";
 
 describe("argument mapping to Actor input", () => {
   it("maps web_search query + defaults straight through", () => {
@@ -53,5 +54,37 @@ describe("argument mapping to Actor input", () => {
 
   it("throws when google_search gets neither query nor queries", () => {
     expect(() => findTool("google_search").mapInput({})).toThrow(/Provide either/);
+  });
+});
+
+describe("extract_with_selectors mapping", () => {
+  it("maps a single url and selectors", () => {
+    expect(
+      extractWithSelectors.mapInput({ url: "https://a.test", selectors: [{ name: "t", selector: "h1" }] }),
+    ).toEqual({ urls: ["https://a.test"], selectors: [{ name: "t", selector: "h1" }] });
+  });
+  it("passes list/crawl options through and maps sitemapUrl", () => {
+    expect(
+      extractWithSelectors.mapInput({
+        url: "https://a.test",
+        selectors: [{ name: "t", selector: "h2" }],
+        itemSelector: ".card",
+        linkSelector: "a.next",
+        maxPages: 5,
+        sitemapUrl: "https://a.test/sitemap.xml",
+        includeMetadata: true,
+      }),
+    ).toEqual({
+      urls: ["https://a.test"],
+      selectors: [{ name: "t", selector: "h2" }],
+      itemSelector: ".card",
+      linkSelector: "a.next",
+      maxPages: 5,
+      sitemapUrls: ["https://a.test/sitemap.xml"],
+      includeMetadata: true,
+    });
+  });
+  it("rejects a call with neither url nor sitemap", () => {
+    expect(() => extractWithSelectors.mapInput({ selectors: [{ name: "t", selector: "h1" }] })).toThrow();
   });
 });

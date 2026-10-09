@@ -1,7 +1,7 @@
 # webdatatools MCP server
 
 An MCP (Model Context Protocol) server that gives AI agents — Claude Desktop, Cursor, Cline, ChatGPT desktop, or
-any other MCP client — ten web-data tools backed by [WebDataTools' Apify Actors](https://apify.com/webdatatools):
+any other MCP client — eleven web-data tools backed by [WebDataTools' Apify Actors](https://apify.com/webdatatools):
 web search, article extraction, site crawling, contact/tech-stack detection, company profiling, e-mail/DNS
 security checks, e-mail validation, package health, and raw Google search.
 
@@ -24,7 +24,7 @@ npx -y github:paulet4a-commits/webdatatools-mcp-server
 ```
 
 The server speaks MCP over stdio. It reads your token from the `APIFY_TOKEN` environment variable. If
-`APIFY_TOKEN` isn't set, the server still starts and lists all ten tools (so it doesn't look broken in a
+`APIFY_TOKEN` isn't set, the server still starts and lists all eleven tools (so it doesn't look broken in a
 client's UI) — calling a tool without a token returns a friendly error telling you where to get one.
 
 ## Claude Desktop
@@ -45,7 +45,7 @@ Edit `claude_desktop_config.json` (Settings → Developer → Edit Config) and a
 }
 ```
 
-Restart Claude Desktop. The ten tools below appear under the "webdatatools" server.
+Restart Claude Desktop. The eleven tools below appear under the "webdatatools" server.
 
 ## Cursor
 
@@ -97,6 +97,7 @@ Any other MCP client that supports a stdio server with an env map works the same
 | `crawl_site_markdown` | [website-to-markdown](https://apify.com/webdatatools/website-to-markdown) | Crawl a site from a start URL and return one Markdown doc per page (`maxPages` controls cost) |
 | `extract_contacts` | [contact-extractor](https://apify.com/webdatatools/contact-extractor) | Pull e-mails, phone numbers and social links off a website |
 | `detect_tech_stack` | [tech-stack-detector](https://apify.com/webdatatools/tech-stack-detector) | Fingerprint CMS, e-commerce, analytics, ad pixels, chat, payments, frameworks, CDN |
+| `extract_with_selectors` | [css-selector-extractor](https://apify.com/webdatatools/css-selector-extractor) | Extract exact fields from any page with CSS selectors; list pages, pagination, sitemaps (billed per page) |
 | `company_profile` | [company-360](https://apify.com/webdatatools/company-360) | One-call company profile: contacts, tech, DNS/e-mail security, TLS grade, hiring, Wikidata facts, SEO |
 | `check_email_security` | [dns-email-security-checker](https://apify.com/webdatatools/dns-email-security-checker) | SPF/DMARC/DKIM, mail & DNS provider, registrar, domain age, 0-100 score |
 | `validate_emails` | [email-validator](https://apify.com/webdatatools/email-validator) | Syntax + disposable/role detection + live MX/A lookup for a list of e-mails |
