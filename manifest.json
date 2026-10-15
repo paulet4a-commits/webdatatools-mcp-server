@@ -1,0 +1,529 @@
+{
+  "manifest_version": "0.3",
+  "name": "webdatatools-mcp-server",
+  "display_name": "WebDataTools",
+  "version": "0.1.0",
+  "description": "Web search, article extraction, site crawling, contact & tech-stack detection, company profiling, e-mail/DNS security and package health as MCP tools. Uses your own Apify API token — billed to you, not us.",
+  "long_description": "WebDataTools exposes ten of WebDataTools' Apify Actors as MCP tools: web search and URL reading, full-site Markdown crawling, contact/social extraction, tech-stack fingerprinting, a one-stop company profile, e-mail/DNS security scoring, bulk e-mail validation, npm/PyPI/Crates.io package health, and raw Google SERP data.\n\nEvery tool call runs on your own Apify account (get a free token with $5/month credit at https://console.apify.com/settings/integrations), so usage is billed to you, never to the server author.",
+  "author": {
+    "name": "WebDataTools",
+    "url": "https://apify.com/webdatatools"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulet4a-commits/webdatatools-mcp-server"
+  },
+  "homepage": "https://apify.com/webdatatools",
+  "support": "https://github.com/paulet4a-commits/webdatatools-mcp-server/issues",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "apify",
+    "web-scraping",
+    "web-search",
+    "ai-agent"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "bin/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/bin/cli.js"
+      ],
+      "env": {
+        "APIFY_TOKEN": "${user_config.apify_token}"
+      }
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  },
+  "user_config": {
+    "apify_token": {
+      "type": "string",
+      "title": "Apify API token",
+      "description": "Your personal Apify API token. Get a free one (with $5/month free credit) at https://console.apify.com/settings/integrations. Every tool call is billed to this account, never to the server author.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "web_search",
+      "description": "Search the web and get back clean Markdown of the top results (or read specific URLs directly, skipping search). Good default choice for 'what is X' / 'find info about X' questions. Each result page fetched is a billed row.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "A single search query, e.g. 'best crm for startups'. Ignored if `queries` or `urls` is set."
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple search queries to run in one call. Overrides `query` when non-empty."
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Specific page URLs to fetch and convert to Markdown directly, skipping the Google search step."
+          },
+          "maxResults": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 3,
+            "description": "How many organic results to read per query."
+          },
+          "outputFormat": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "text",
+              "both"
+            ],
+            "default": "markdown",
+            "description": "Body format to return for each result."
+          },
+          "countryCode": {
+            "type": "string",
+            "default": "us",
+            "description": "2-letter country code for localised results (gl)."
+          },
+          "languageCode": {
+            "type": "string",
+            "default": "en",
+            "description": "2-letter interface language code (hl)."
+          },
+          "includeSnippetOnly": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, return only the SERP title/url/snippet without fetching the page (faster, cheaper)."
+          }
+        }
+      }
+    },
+    {
+      "name": "read_url",
+      "description": "Fetch one or more article/blog/news URLs and return clean, readable article text as Markdown (title, author, date, body). Use this instead of web_search when you already have the exact URL to read.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A single article URL to extract, e.g. https://blog.apify.com/some-post/."
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple article URLs to extract in one call. Overrides `url` when non-empty."
+          },
+          "outputFormat": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "text",
+              "html",
+              "all"
+            ],
+            "default": "markdown",
+            "description": "Which body format(s) to return. Markdown is smallest and best for LLM use."
+          },
+          "includeImages": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include the main image and image list; turn off for a smaller, text-only result."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "crawl_site_markdown",
+      "description": "Crawl a website starting from one URL and return one Markdown document per page (docs sites, blogs, knowledge bases). Billed per page crawled, so keep `maxPages` as low as the task allows.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The page to start crawling from, e.g. https://docs.apify.com/platform."
+          },
+          "maxPages": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000,
+            "default": 50,
+            "description": "Maximum number of pages to crawl and convert. This is the billed unit — raise only as needed."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10,
+            "default": 3,
+            "description": "How many links deep to follow from the start URL."
+          },
+          "sameDomainOnly": {
+            "type": "boolean",
+            "default": true,
+            "description": "Only follow links on the same domain as the start URL."
+          },
+          "useSitemap": {
+            "type": "boolean",
+            "default": true,
+            "description": "Also seed the crawl from the domain's sitemap.xml."
+          },
+          "outputFormat": {
+            "type": "string",
+            "enum": [
+              "markdown",
+              "text",
+              "both"
+            ],
+            "default": "markdown",
+            "description": "Content format to return per page."
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    },
+    {
+      "name": "extract_contacts",
+      "description": "Crawl a website's home/about/contact pages and pull out e-mail addresses, phone numbers and social profile links (LinkedIn, X/Twitter, Instagram, Facebook, YouTube, TikTok, GitHub, Telegram, WhatsApp).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A single website to crawl, e.g. https://example.com or example.com."
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple websites to crawl in one call (one result row per site). Overrides `url` when non-empty."
+          },
+          "maxPagesPerDomain": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 30,
+            "description": "How many pages to crawl per website."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "default": 2,
+            "description": "How many links deep to follow from the start page."
+          },
+          "followSubdomains": {
+            "type": "boolean",
+            "default": false,
+            "description": "Also crawl subdomains such as blog.example.com."
+          },
+          "extractEmails": {
+            "type": "boolean",
+            "default": true,
+            "description": "Collect e-mail addresses."
+          },
+          "extractPhones": {
+            "type": "boolean",
+            "default": true,
+            "description": "Collect phone numbers (from tel: links only)."
+          },
+          "extractSocials": {
+            "type": "boolean",
+            "default": true,
+            "description": "Collect social profile links."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "detect_tech_stack",
+      "description": "Fingerprint a website's technology stack: CMS, e-commerce platform, analytics, ad pixels, e-mail marketing, chat widgets, payment providers, front-end frameworks, cookie consent, CDN/hosting and web server.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "A single website to fingerprint, e.g. https://example.com or example.com."
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple websites to fingerprint in one call (one result row per site). Overrides `url` when non-empty."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "cms",
+                "ecommerce",
+                "analytics",
+                "advertising",
+                "emailMarketing",
+                "chat",
+                "payments",
+                "frameworks",
+                "cookieConsent",
+                "cdn",
+                "server"
+              ]
+            },
+            "description": "Restrict detection to these categories. Leave empty to detect everything."
+          },
+          "maxPagesPerDomain": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50,
+            "default": 3,
+            "description": "How many pages to fetch per website."
+          },
+          "followSubdomains": {
+            "type": "boolean",
+            "default": false,
+            "description": "Also inspect subdomains such as shop.example.com."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "company_profile",
+      "description": "Build a one-stop company profile for a domain: contacts, tech stack, DNS/e-mail security, TLS/security grade, hiring signals, Wikidata company facts (HQ, employees, revenue, founders) and an SEO audit. Turn off sections you don't need to make the run cheaper and faster.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "A single company domain, e.g. apify.com."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple company domains (one result row per domain). Overrides `domain` when non-empty."
+          },
+          "includeContacts": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include e-mails, phone numbers and social links."
+          },
+          "includeTechStack": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include CMS/e-commerce/analytics/etc. fingerprint."
+          },
+          "includeEmailSecurity": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include SPF/DMARC, mail provider, registrar, domain age."
+          },
+          "includeSecurityAudit": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include TLS validity/expiry and HTTP security header grade."
+          },
+          "includeHiring": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include open job counts / hiring velocity where an ATS board is found."
+          },
+          "includeCompanyFacts": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include Wikidata facts: HQ, employees, revenue, founders."
+          },
+          "includeSeo": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include a 0-100 on-page SEO score and issue list for the home page."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "check_email_security",
+      "description": "Check a domain's DNS and e-mail security posture: SPF, DMARC, DKIM selector presence, mail/DNS provider, registrar and domain age, with an overall 0-100 score.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "A single domain to check, e.g. apify.com."
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple domains to check in one call (one result row per domain). Overrides `domain` when non-empty."
+          },
+          "checkDkim": {
+            "type": "boolean",
+            "default": true,
+            "description": "Probe common DKIM selectors. Costs extra DNS queries per domain but is needed for a full score."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "validate_emails",
+      "description": "Validate a list of e-mail addresses: syntax check, disposable/role-account detection and (optionally) a live MX/A DNS lookup to confirm the domain can receive mail. Good for cleaning a lead list before sending.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "A single e-mail address to validate."
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple e-mail addresses to validate in one call. Overrides `email` when non-empty."
+          },
+          "checkMx": {
+            "type": "boolean",
+            "default": true,
+            "description": "Look up MX/A records over DNS-over-HTTPS. Turn off for a faster syntax-only check."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "package_health",
+      "description": "Check the health of npm, PyPI or Crates.io packages: latest version, publish recency, download stats, license, and (optionally) GitHub stars/forks/open-issues/archived status. Prefix a name with its registry, e.g. pypi:requests.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "package": {
+            "type": "string",
+            "description": "A single package to check, e.g. npm:react or pypi:requests."
+          },
+          "packages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple packages to check in one call. Overrides `package` when non-empty."
+          },
+          "defaultRegistry": {
+            "type": "string",
+            "enum": [
+              "npm",
+              "pypi",
+              "crates"
+            ],
+            "default": "npm",
+            "description": "Registry to assume for bare package names with no prefix."
+          },
+          "enrichGithub": {
+            "type": "boolean",
+            "default": true,
+            "description": "Add GitHub stars/forks/open-issues/archived/last-push when the package links to a GitHub repo."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "google_search",
+      "description": "Run a raw Google search and get back structured SERP data: organic results, People Also Ask, related searches. Use this when you need Google's ranking/position data itself, not just page content (for that, use web_search).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "A single Google search query, e.g. 'apify web scraping'."
+          },
+          "queries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple queries to run in one call. Overrides `query` when non-empty."
+          },
+          "countryCode": {
+            "type": "string",
+            "default": "us",
+            "description": "2-letter country code to localise results (gl)."
+          },
+          "languageCode": {
+            "type": "string",
+            "default": "en",
+            "description": "2-letter interface language code (hl)."
+          },
+          "resultsPerPage": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 100,
+            "default": 10,
+            "description": "Results per SERP page."
+          },
+          "maxPagesPerQuery": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 1,
+            "description": "How many result pages to fetch per query."
+          },
+          "device": {
+            "type": "string",
+            "enum": [
+              "desktop",
+              "mobile"
+            ],
+            "default": "desktop",
+            "description": "Device type to emulate."
+          },
+          "includePeopleAlsoAsk": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include the People Also Ask box."
+          },
+          "includeRelatedSearches": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include related-search suggestions."
+          },
+          "safeSearch": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable Google SafeSearch filtering."
+          }
+        },
+        "required": []
+      }
+    }
+  ]
+}
